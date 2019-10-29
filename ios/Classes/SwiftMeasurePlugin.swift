@@ -10,7 +10,7 @@ public class SwiftMeasurePlugin: NSObject, FlutterPlugin {
     
     private func _isDistanceMetric () -> Bool{
         let locale = NSLocale.autoupdatingCurrent as NSLocale
-        let result = (locale as NSLocale).object(forKey: .measurementSystem) as? String
+        let result = locale.object(forKey: .measurementSystem) as? String
         if( result == "Metric") {
             return true
         }
@@ -19,7 +19,7 @@ public class SwiftMeasurePlugin: NSObject, FlutterPlugin {
 
     private func _isHeightWeightMetric() -> Bool {
         let locale = NSLocale.autoupdatingCurrent as NSLocale
-        return locale.usesMetricSystem
+        return locale.object(forKey: .usesMetricSystem) as! Bool
     }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
