@@ -33,6 +33,7 @@ public class MeasurePlugin implements MethodCallHandler {
         channel.setMethodCallHandler(new MeasurePlugin(registrar.activity()));
     }
 
+    @SuppressWarnings("deprecation")
     private Locale _getCurrentLocale() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return _activity.getBaseContext().getResources().getConfiguration().getLocales().get(0);
