@@ -64,8 +64,10 @@ public class MeasurePlugin implements MethodCallHandler {
         switch (call.method) {
             case "distanceIsMetric":
                 result.success(this._isDistanceMetric());
+                break;
             case "heightIsMetric":
                 result.success(this._isHeightWeightMetric());
+                break;
             default:
                 result.notImplemented();
         }
