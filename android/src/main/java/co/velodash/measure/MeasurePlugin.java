@@ -1,6 +1,6 @@
 package co.velodash.measure;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 
 import java.util.Locale;
@@ -9,36 +9,39 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 
 /**
  * MeasurePlugin
  */
-public class MeasurePlugin implements MethodCallHandler {
+public class MeasurePlugin implements MethodCallHandler, FlutterPlugin {
 
     public static final String[] DISTANCE_IMPERIAL_COUNTRIES = {"US", "GB", "LR", "MM"};
     public static final String[] HEIGHT_WEIGHT_TEMPERATURE_IMPERIAL_COUNTRIES = {"US", "GB", "LR", "MM"};
 
-    private final Activity _activity;
+    private static final String CHANNEL_NAME = "plugins.flutter.io/measure";
+    private Context applicationContext;
+    private MethodChannel channel;
 
-    private MeasurePlugin(Activity activity) {
-        this._activity = activity;
+    @Override
+    public void onAttachedToEngine(FlutterPluginBinding flutterPluginBinding) {
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), CHANNEL_NAME);
+        channel.setMethodCallHandler(this);
+        applicationContext = flutterPluginBinding.getApplicationContext();
     }
 
-    /**
-     * Plugin registration.
-     */
-    public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "plugins.flutter.io/measure");
-        channel.setMethodCallHandler(new MeasurePlugin(registrar.activity()));
+    @Override
+    public void onDetachedFromEngine(FlutterPluginBinding flutterPluginBinding) {
+        channel.setMethodCallHandler(null);
+        applicationContext = null;
     }
 
     @SuppressWarnings("deprecation")
     private Locale _getCurrentLocale() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return _activity.getBaseContext().getResources().getConfiguration().getLocales().get(0);
+            return applicationContext.getResources().getConfiguration().getLocales().get(0);
         } else {
-            return _activity.getBaseContext().getResources().getConfiguration().locale;
+            return applicationContext.getResources().getConfiguration().locale;
         }
     }
 
