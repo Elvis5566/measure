@@ -3,7 +3,10 @@ package co.velodash.measure;
 import android.content.Context;
 import android.os.Build;
 
+import android.content.pm.PackageManager;
 import java.util.Locale;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -37,16 +40,21 @@ public class MeasurePlugin implements MethodCallHandler, FlutterPlugin {
     }
 
     @SuppressWarnings("deprecation")
-    private Locale _getCurrentLocale() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return applicationContext.getResources().getConfiguration().getLocales().get(0);
+    private String _getCurrentContryCode() {
+        if(applicationContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY)){
+            TelephonyManager tm = (TelephonyManager) applicationContext.getSystemService(Context.TELEPHONY_SERVICE);
+            String countryCodeValue = tm.getNetworkCountryIso();
+//            Log.d("CountryCode", countryCodeValue);
+            return countryCodeValue;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return applicationContext.getResources().getConfiguration().getLocales().get(0).getCountry();
         } else {
-            return applicationContext.getResources().getConfiguration().locale;
+            return applicationContext.getResources().getConfiguration().locale.getCountry();
         }
     }
 
     private boolean _isMetricFromList(String[] data) {
-        final String countryCode = this._getCurrentLocale().getCountry();
+        final String countryCode = this._getCurrentContryCode();
         for (String usesImperialCountry : data) {
             if (usesImperialCountry.equalsIgnoreCase(countryCode)) {
                 return false;
